@@ -138,16 +138,7 @@ class sdpram(
     val READ_DEPTH: Int = WRITE_DEPTH* WRITE_WIDTH /  READ_WIDTH;
     val ADDR_WIDTH_A: Int = log2Up(WRITE_DEPTH)
     val ADDR_WIDTH_B: Int = log2Up(READ_DEPTH)
-    val io = new Bundle {
 
-        val doutb = out Bits (READ_WIDTH bits)
-        val addra = in Bits (log2Up(WRITE_DEPTH) bits)
-        val addrb = in Bits (log2Up(READ_DEPTH) bits)
-        val dina = in Bits (WRITE_WIDTH bits)
-        val ena = in Bool()
-        val enb = in Bool()
-        val wea = in Bits (1 bits)
-    }
     assert(MEMORY_TYPE == "auto" || MEMORY_TYPE == "block" || MEMORY_TYPE == "distributed" || MEMORY_TYPE == "ultra", "MEMORY_TYPE应为auto，block，distributed，ultra中的一种")
     if (MEMORY_TYPE == "block") {
         assert(READ_LATENCY >= 1, "使用BRAM时,READ_LATENCY至少为1")
@@ -188,6 +179,16 @@ class sdpram(
     rstb := False
     val sleep = Bool()
     sleep := False
+    val io = new Bundle {
+
+        val doutb = out Bits (READ_WIDTH bits)
+        val addra = in Bits (log2Up(WRITE_DEPTH) bits)
+        val addrb = in Bits (log2Up(READ_DEPTH) bits)
+        val dina = in Bits (WRITE_WIDTH bits)
+        val ena = in Bool()
+        val enb = in Bool()
+        val wea = in Bits (WRITE_DATA_WIDTH_A/BYTE_WRITE_WIDTH_A bits)
+    }
     val temp = xpm_memory_sdpram(ADDR_WIDTH_A, ADDR_WIDTH_B, AUTO_SLEEP_TIME, BYTE_WRITE_WIDTH_A, CASCADE_HEIGHT, CLOCKING_MODE, ECC_MODE, MEMORY_INIT_FILE,
         MEMORY_INIT_PARAM, MEMORY_OPTIMIZATION, MEMORY_PRIMITIVE, MEMORY_SIZE, MESSAGE_CONTROL, READ_DATA_WIDTH_B, READ_LATENCY_B, READ_RESET_VALUE_B,
         RST_MODE_A, RST_MODE_B, SIM_ASSERT_CHK, USE_EMBEDDED_CONSTRAINT, USE_MEM_INIT, WAKEUP_TIME, WRITE_DATA_WIDTH_A, WRITE_MODE_B)(dbiterrb, io.doutb, sbiterrb, io.addra, io.addrb, io.dina, io.ena, io.enb, injectdbiterra, injectsbiterra,
@@ -196,7 +197,7 @@ class sdpram(
     noIoPrefix()
 }
 
-object Test {
+object sdpram {
     def main(args: Array[String]): Unit = {
         SpinalConfig(targetDirectory = "verilog/xmemory").generateVerilog(new sdpram(32, 512, 32, "block", 1))
     }
