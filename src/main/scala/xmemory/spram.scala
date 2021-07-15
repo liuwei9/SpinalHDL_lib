@@ -134,7 +134,7 @@ class spram(
     val MEMORY_INIT_PARAM: String = "0" // String
     val MEMORY_OPTIMIZATION: String = "true" // String
     val MEMORY_PRIMITIVE: String = MEMORY_TYPE // String
-    val MEMORY_SIZE: Int = scala.math.pow(2,ADDR_WIDTH_A).toInt * WRITE_WIDTH + 2 // DECIMAL
+    val MEMORY_SIZE: Int = scala.math.pow(2,ADDR_WIDTH_A).toInt * WRITE_WIDTH  // DECIMAL
     val MESSAGE_CONTROL: Int = 0 // DECIMAL
     val READ_DATA_WIDTH_A: Int = READ_WIDTH // DECIMAL
     val READ_LATENCY_A: Int = READ_LATENCY // DECIMAL
