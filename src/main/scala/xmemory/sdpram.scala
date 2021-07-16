@@ -26,7 +26,9 @@ class xpm_memory_sdpram(
                            USE_MEM_INIT: Int = 1, // DECIMAL
                            WAKEUP_TIME: String = "disable_sleep", // String
                            WRITE_DATA_WIDTH_A: Int = 32, // DECIMAL
-                           WRITE_MODE_B: String = "no_change" // String
+                           WRITE_MODE_B: String = "no_change", // String
+                           clka: ClockDomain,
+                           clkb: ClockDomain
                        ) extends BlackBox {
     addGeneric("ADDR_WIDTH_A", ADDR_WIDTH_A)
     addGeneric("ADDR_WIDTH_B", ADDR_WIDTH_B)
@@ -70,8 +72,8 @@ class xpm_memory_sdpram(
         val sleep = in Bool()
         val wea = in Bits (WRITE_DATA_WIDTH_A / BYTE_WRITE_WIDTH_A bits)
     }
-    mapClockDomain(clock = io.clka)
-    mapClockDomain(clock = io.clkb)
+    mapClockDomain(clka, io.clka)
+    mapClockDomain(clkb, io.clkb)
     noIoPrefix()
 }
 
@@ -100,12 +102,14 @@ object xpm_memory_sdpram {
               USE_MEM_INIT: Int = 1, // DECIMAL
               WAKEUP_TIME: String = "disable_sleep", // String
               WRITE_DATA_WIDTH_A: Int = 32, // DECIMAL
-              WRITE_MODE_B: String = "no_change" // String
+              WRITE_MODE_B: String = "no_change" ,// String
+                  clka: ClockDomain,
+              clkb: ClockDomain
              )(dbiterrb: Bool, doutb: Bits, sbiterrb: Bool, addra: Bits, addrb: Bits, dina: Bits, ena: Bool, enb: Bool, injectdbiterra: Bool,
                injectsbiterra: Bool, regceb: Bool, rstb: Bool, sleep: Bool, wea: Bits): xpm_memory_sdpram = {
         val temp = new xpm_memory_sdpram(ADDR_WIDTH_A, ADDR_WIDTH_B, AUTO_SLEEP_TIME, BYTE_WRITE_WIDTH_A, CASCADE_HEIGHT, CLOCKING_MODE, ECC_MODE, MEMORY_INIT_FILE,
             MEMORY_INIT_PARAM, MEMORY_OPTIMIZATION, MEMORY_PRIMITIVE, MEMORY_SIZE, MESSAGE_CONTROL, READ_DATA_WIDTH_B, READ_LATENCY_B, READ_RESET_VALUE_B,
-            RST_MODE_A, RST_MODE_B, SIM_ASSERT_CHK, USE_EMBEDDED_CONSTRAINT, USE_MEM_INIT, WAKEUP_TIME, WRITE_DATA_WIDTH_A, WRITE_MODE_B)
+            RST_MODE_A, RST_MODE_B, SIM_ASSERT_CHK, USE_EMBEDDED_CONSTRAINT, USE_MEM_INIT, WAKEUP_TIME, WRITE_DATA_WIDTH_A, WRITE_MODE_B,clka,clkb)
         temp.io.dbiterrb <> dbiterrb
         temp.io.doutb <> doutb
         temp.io.sbiterrb <> sbiterrb
@@ -188,10 +192,25 @@ class sdpram(
         val ena = in Bool()
         val enb = in Bool()
         val wea = in Bits (WRITE_DATA_WIDTH_A/BYTE_WRITE_WIDTH_A bits)
+        val clka = in Bool()
+        val clkb = in Bool()
+
     }
+    val clka = ClockDomain(
+        clock  = io.clka,
+        config = ClockDomainConfig(
+            clockEdge        = RISING
+        )
+    )
+    val clkb = ClockDomain(
+        clock  = io.clkb,
+        config = ClockDomainConfig(
+            clockEdge        = RISING
+        )
+    )
     val temp = xpm_memory_sdpram(ADDR_WIDTH_A, ADDR_WIDTH_B, AUTO_SLEEP_TIME, BYTE_WRITE_WIDTH_A, CASCADE_HEIGHT, CLOCKING_MODE, ECC_MODE, MEMORY_INIT_FILE,
         MEMORY_INIT_PARAM, MEMORY_OPTIMIZATION, MEMORY_PRIMITIVE, MEMORY_SIZE, MESSAGE_CONTROL, READ_DATA_WIDTH_B, READ_LATENCY_B, READ_RESET_VALUE_B,
-        RST_MODE_A, RST_MODE_B, SIM_ASSERT_CHK, USE_EMBEDDED_CONSTRAINT, USE_MEM_INIT, WAKEUP_TIME, WRITE_DATA_WIDTH_A, WRITE_MODE_B)(dbiterrb, io.doutb, sbiterrb, io.addra, io.addrb, io.dina, io.ena, io.enb, injectdbiterra, injectsbiterra,
+        RST_MODE_A, RST_MODE_B, SIM_ASSERT_CHK, USE_EMBEDDED_CONSTRAINT, USE_MEM_INIT, WAKEUP_TIME, WRITE_DATA_WIDTH_A, WRITE_MODE_B,clka,clkb)(dbiterrb, io.doutb, sbiterrb, io.addra, io.addrb, io.dina, io.ena, io.enb, injectdbiterra, injectsbiterra,
         regceb, rstb, sleep, io.wea)
 
     noIoPrefix()

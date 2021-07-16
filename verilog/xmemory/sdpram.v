@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.5.0    git head : 83a031922866b078c411ec5529e00f1b6e79f8e7
 // Component : sdpram
-// Git hash  : d924bc258218f1c223ee0fcac1b2eff8975094e7
+// Git hash  : d6c8385615e51d6f90f6af958694115aa84f6c59
 
 
 
@@ -12,7 +12,8 @@ module sdpram (
   input               ena,
   input               enb,
   input      [0:0]    wea,
-  input               clk
+  input               clka,
+  input               clkb
 );
   wire                temp_dbiterrb;
   wire       [31:0]   temp_doutb;
@@ -37,7 +38,7 @@ module sdpram (
     .MEMORY_INIT_PARAM("0"),
     .MEMORY_OPTIMIZATION("true"),
     .MEMORY_PRIMITIVE("block"),
-    .MEMORY_SIZE(16386),
+    .MEMORY_SIZE(16384),
     .MESSAGE_CONTROL(0),
     .READ_DATA_WIDTH_B(32),
     .READ_LATENCY_B(1),
@@ -56,8 +57,8 @@ module sdpram (
     .sbiterrb          (temp_sbiterrb   ), //o
     .addra             (addra           ), //i
     .addrb             (addrb           ), //i
-    .clka              (clk             ), //i
-    .clkb              (clk             ), //i
+    .clka              (clka            ), //i
+    .clkb              (clkb            ), //i
     .dina              (dina            ), //i
     .ena               (ena             ), //i
     .enb               (enb             ), //i
