@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.5.0    git head : 83a031922866b078c411ec5529e00f1b6e79f8e7
 // Component : spram
-// Git hash  : 7c80b4e3b0a60b316a6d9ae832dbea255ae9c4d9
+// Git hash  : c6278c97c9fa1106e0e337fcbf29086b19818904
 
 
 
@@ -33,7 +33,7 @@ module spram (
     .MEMORY_INIT_PARAM("0"),
     .MEMORY_OPTIMIZATION("true"),
     .MEMORY_PRIMITIVE("block"),
-    .MEMORY_SIZE(16384),
+    .MEMORY_SIZE(16352),
     .MESSAGE_CONTROL(0),
     .READ_DATA_WIDTH_A(32),
     .READ_LATENCY_A(1),

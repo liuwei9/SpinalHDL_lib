@@ -1,4 +1,5 @@
 package xmemory
+
 import spinal.core._
 import spinal.lib._
 
@@ -102,14 +103,14 @@ object xpm_memory_sdpram {
               USE_MEM_INIT: Int = 1, // DECIMAL
               WAKEUP_TIME: String = "disable_sleep", // String
               WRITE_DATA_WIDTH_A: Int = 32, // DECIMAL
-              WRITE_MODE_B: String = "no_change" ,// String
-                  clka: ClockDomain,
+              WRITE_MODE_B: String = "no_change", // String
+              clka: ClockDomain,
               clkb: ClockDomain
              )(dbiterrb: Bool, doutb: Bits, sbiterrb: Bool, addra: Bits, addrb: Bits, dina: Bits, ena: Bool, enb: Bool, injectdbiterra: Bool,
                injectsbiterra: Bool, regceb: Bool, rstb: Bool, sleep: Bool, wea: Bits): xpm_memory_sdpram = {
         val temp = new xpm_memory_sdpram(ADDR_WIDTH_A, ADDR_WIDTH_B, AUTO_SLEEP_TIME, BYTE_WRITE_WIDTH_A, CASCADE_HEIGHT, CLOCKING_MODE, ECC_MODE, MEMORY_INIT_FILE,
             MEMORY_INIT_PARAM, MEMORY_OPTIMIZATION, MEMORY_PRIMITIVE, MEMORY_SIZE, MESSAGE_CONTROL, READ_DATA_WIDTH_B, READ_LATENCY_B, READ_RESET_VALUE_B,
-            RST_MODE_A, RST_MODE_B, SIM_ASSERT_CHK, USE_EMBEDDED_CONSTRAINT, USE_MEM_INIT, WAKEUP_TIME, WRITE_DATA_WIDTH_A, WRITE_MODE_B,clka,clkb)
+            RST_MODE_A, RST_MODE_B, SIM_ASSERT_CHK, USE_EMBEDDED_CONSTRAINT, USE_MEM_INIT, WAKEUP_TIME, WRITE_DATA_WIDTH_A, WRITE_MODE_B, clka, clkb)
         temp.io.dbiterrb <> dbiterrb
         temp.io.doutb <> doutb
         temp.io.sbiterrb <> sbiterrb
@@ -135,11 +136,11 @@ class sdpram(
                 WRITE_WIDTH: Int,
                 WRITE_DEPTH: Int,
                 READ_WIDTH: Int,
+                READ_DEPTH:Int,
                 MEMORY_TYPE: String = "block",
                 READ_LATENCY: Int = 2
             ) extends Component {
-
-    val READ_DEPTH: Int = WRITE_DEPTH* WRITE_WIDTH /  READ_WIDTH;
+    assert(WRITE_DEPTH*WRITE_WIDTH == READ_DEPTH*READ_WIDTH,"读写空间大小不匹配，WRITE_DEPTH*WRITE_WIDTH和READ_DEPTH*READ_WIDTH大小应相等")
     val ADDR_WIDTH_A: Int = log2Up(WRITE_DEPTH)
     val ADDR_WIDTH_B: Int = log2Up(READ_DEPTH)
 
@@ -156,7 +157,7 @@ class sdpram(
     val MEMORY_INIT_PARAM: String = "0" // String
     val MEMORY_OPTIMIZATION: String = "true" // String
     val MEMORY_PRIMITIVE: String = MEMORY_TYPE // String
-    val MEMORY_SIZE: Int = scala.math.pow(2,ADDR_WIDTH_A).toInt * WRITE_WIDTH // DECIMAL
+    val MEMORY_SIZE: Int =  WRITE_DEPTH*WRITE_WIDTH// DECIMAL
     val MESSAGE_CONTROL: Int = 0 // DECIMAL
     val READ_DATA_WIDTH_B: Int = READ_WIDTH // DECIMAL
     val READ_LATENCY_B: Int = READ_LATENCY // DECIMAL
@@ -191,26 +192,26 @@ class sdpram(
         val dina = in Bits (WRITE_WIDTH bits)
         val ena = in Bool()
         val enb = in Bool()
-        val wea = in Bits (WRITE_DATA_WIDTH_A/BYTE_WRITE_WIDTH_A bits)
+        val wea = in Bits (WRITE_DATA_WIDTH_A / BYTE_WRITE_WIDTH_A bits)
         val clka = in Bool()
         val clkb = in Bool()
 
     }
     val clka = ClockDomain(
-        clock  = io.clka,
+        clock = io.clka,
         config = ClockDomainConfig(
-            clockEdge        = RISING
+            clockEdge = RISING
         )
     )
     val clkb = ClockDomain(
-        clock  = io.clkb,
+        clock = io.clkb,
         config = ClockDomainConfig(
-            clockEdge        = RISING
+            clockEdge = RISING
         )
     )
     val temp = xpm_memory_sdpram(ADDR_WIDTH_A, ADDR_WIDTH_B, AUTO_SLEEP_TIME, BYTE_WRITE_WIDTH_A, CASCADE_HEIGHT, CLOCKING_MODE, ECC_MODE, MEMORY_INIT_FILE,
         MEMORY_INIT_PARAM, MEMORY_OPTIMIZATION, MEMORY_PRIMITIVE, MEMORY_SIZE, MESSAGE_CONTROL, READ_DATA_WIDTH_B, READ_LATENCY_B, READ_RESET_VALUE_B,
-        RST_MODE_A, RST_MODE_B, SIM_ASSERT_CHK, USE_EMBEDDED_CONSTRAINT, USE_MEM_INIT, WAKEUP_TIME, WRITE_DATA_WIDTH_A, WRITE_MODE_B,clka,clkb)(dbiterrb, io.doutb, sbiterrb, io.addra, io.addrb, io.dina, io.ena, io.enb, injectdbiterra, injectsbiterra,
+        RST_MODE_A, RST_MODE_B, SIM_ASSERT_CHK, USE_EMBEDDED_CONSTRAINT, USE_MEM_INIT, WAKEUP_TIME, WRITE_DATA_WIDTH_A, WRITE_MODE_B, clka, clkb)(dbiterrb, io.doutb, sbiterrb, io.addra, io.addrb, io.dina, io.ena, io.enb, injectdbiterra, injectsbiterra,
         regceb, rstb, sleep, io.wea)
 
     noIoPrefix()
@@ -218,6 +219,6 @@ class sdpram(
 
 object sdpram {
     def main(args: Array[String]): Unit = {
-        SpinalConfig(targetDirectory = "verilog/xmemory").generateVerilog(new sdpram(32, 512, 32, "block", 1))
+        SpinalConfig(targetDirectory = "verilog/xmemory").generateVerilog(new sdpram(32, 511, 16, 1022,"block", 1))
     }
 }

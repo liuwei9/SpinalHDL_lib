@@ -35,7 +35,7 @@ class xpm_memory_spram(
     addGeneric("MEMORY_PRIMITIVE", MEMORY_PRIMITIVE)
     addGeneric("MEMORY_SIZE", MEMORY_SIZE)
     addGeneric("MESSAGE_CONTROL", MESSAGE_CONTROL)
-    addGeneric("READ_DATA_WIDTH_A", READ_DATA_WIDTH_A)
+    addGeneric("READ_DATA_WIDTH_A", READ_DATA_WIDTH_A) //Specify the width of the port A read data output port douta, in bits. The values of READ_DATA_WIDTH_A and WRITE_DATA_WIDTH_A must be equal.
     addGeneric("READ_LATENCY_A", READ_LATENCY_A)
     addGeneric("READ_RESET_VALUE_A", READ_RESET_VALUE_A)
     addGeneric("RST_MODE_A", RST_MODE_A)
@@ -110,16 +110,15 @@ object xpm_memory_spram {
 }
 
 class spram(
-               WRITE_WIDTH: Int,
-               WRITE_DEPTH: Int,
-               READ_WIDTH: Int,
+               WIDTH: Int,
+               DEPTH: Int,
                MEMORY_TYPE: String = "block",
                READ_LATENCY: Int = 2,
                OPT_MODE: String = "read_first"
            ) extends Component {
 
 
-    val ADDR_WIDTH_A: Int = log2Up(WRITE_DEPTH)
+    val ADDR_WIDTH_A: Int = log2Up(DEPTH)
 
     assert(MEMORY_TYPE == "auto" || MEMORY_TYPE == "block" || MEMORY_TYPE == "distributed" || MEMORY_TYPE == "ultra", "MEMORY_TYPE应为auto，block，distributed，ultra中的一种")
     if (MEMORY_TYPE == "block") {
@@ -127,23 +126,23 @@ class spram(
     }
     assert(OPT_MODE == "read_first" || OPT_MODE == "write_first" || OPT_MODE == "no_change", "MEMORY_TYPE应为read_first，write_first，no_change中的一种")
     val AUTO_SLEEP_TIME: Int = 0 // DECIMAL
-    val BYTE_WRITE_WIDTH_A: Int = WRITE_WIDTH // DECIMAL
+    val BYTE_WRITE_WIDTH_A: Int = WIDTH // DECIMAL
     val CASCADE_HEIGHT: Int = 0 // DECIMAL
     val ECC_MODE: String = "no_ecc" // String
     val MEMORY_INIT_FILE: String = "none" // String
     val MEMORY_INIT_PARAM: String = "0" // String
     val MEMORY_OPTIMIZATION: String = "true" // String
     val MEMORY_PRIMITIVE: String = MEMORY_TYPE // String
-    val MEMORY_SIZE: Int = scala.math.pow(2,ADDR_WIDTH_A).toInt * WRITE_WIDTH  // DECIMAL
+    val MEMORY_SIZE: Int = DEPTH * WIDTH // DECIMAL
     val MESSAGE_CONTROL: Int = 0 // DECIMAL
-    val READ_DATA_WIDTH_A: Int = READ_WIDTH // DECIMAL
+    val READ_DATA_WIDTH_A: Int = WIDTH // DECIMAL
     val READ_LATENCY_A: Int = READ_LATENCY // DECIMAL
     val READ_RESET_VALUE_A: String = "0" // String
     val RST_MODE_A: String = "SYNC" // String
     val SIM_ASSERT_CHK: Int = 0 // DECIMAL; 0=disable simulation messages, 1=enable simulation messages
     val USE_MEM_INIT: Int = 1 // DECIMAL
     val WAKEUP_TIME: String = "disable_sleep" // String
-    val WRITE_DATA_WIDTH_A: Int = WRITE_WIDTH // DECIMAL
+    val WRITE_DATA_WIDTH_A: Int = WIDTH // DECIMAL
     val WRITE_MODE_A: String = OPT_MODE // String
     val dbiterra = Bool()
     val sbiterra = Bool()
@@ -157,22 +156,23 @@ class spram(
     rsta := False
     val sleep = Bool()
     sleep := False
-    val io = new Bundle{
-        val addra = in Bits(log2Up(WRITE_DEPTH) bits)
-        val dina = in Bits(WRITE_WIDTH bits)
-        val douta = out Bits(READ_WIDTH bits)
+    val io = new Bundle {
+        val addra = in Bits (ADDR_WIDTH_A bits)
+        val dina = in Bits (WIDTH bits)
+        val douta = out Bits (WIDTH bits)
         val ena = in Bool()
-        val wea = in Bits(WRITE_DATA_WIDTH_A/BYTE_WRITE_WIDTH_A bits)
+        val wea = in Bits (WRITE_DATA_WIDTH_A / BYTE_WRITE_WIDTH_A bits)
     }
     val temp = xpm_memory_spram(ADDR_WIDTH_A, AUTO_SLEEP_TIME, BYTE_WRITE_WIDTH_A, CASCADE_HEIGHT, ECC_MODE, MEMORY_INIT_FILE,
         MEMORY_INIT_PARAM, MEMORY_OPTIMIZATION, MEMORY_PRIMITIVE, MEMORY_SIZE, MESSAGE_CONTROL, READ_DATA_WIDTH_A, READ_LATENCY_A, READ_RESET_VALUE_A,
-        RST_MODE_A,  SIM_ASSERT_CHK,  USE_MEM_INIT, WAKEUP_TIME, WRITE_DATA_WIDTH_A, WRITE_MODE_A)(dbiterra, io.douta, sbiterra, io.addra,  io.dina, io.ena, injectdbiterra, injectsbiterra,
+        RST_MODE_A, SIM_ASSERT_CHK, USE_MEM_INIT, WAKEUP_TIME, WRITE_DATA_WIDTH_A, WRITE_MODE_A)(dbiterra, io.douta, sbiterra, io.addra, io.dina, io.ena, injectdbiterra, injectsbiterra,
         regcea, rsta, sleep, io.wea)
 
     noIoPrefix()
 }
+
 object spram {
     def main(args: Array[String]): Unit = {
-        SpinalConfig(targetDirectory = "verilog/xmemory").generateVerilog(new spram(32, 512, 32, "block", 1,OPT_MODE = "read_first"))
+        SpinalConfig(targetDirectory = "verilog/xmemory").generateVerilog(new spram(32, 511, "block", 1, OPT_MODE = "read_first"))
     }
 }
