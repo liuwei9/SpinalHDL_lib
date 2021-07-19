@@ -168,16 +168,60 @@ object xpm_memory_tdpram {
     }
 }
 
-class tdpram (
-                 WRITE_WIDTH_A: Int,
-                 WRITE_DEPTH_A: Int,
-                 READ_WIDTH_A: Int,
-                 MEMORY_TYPE: String = "block",
-                 READ_LATENCY: Int = 2
-             )extends Component {
+class tdpram(
+                WIDTH_A: Int,
+                DEPTH_A: Int,
+                WIDTH_B: Int,
+                DEPTH_B: Int,
+                MEMORY_TYPE: String = "block",
+                READ_LATENCY_A: Int = 2,
+                READ_LATENCY_B: Int = 2
+            ) extends Component {
+    private val size_a = WIDTH_A * DEPTH_A
 
+    private val size_b = WIDTH_B * DEPTH_B
+    private val msg = "DEPTH_A*WIDTH_A,DEPTH_B*WIDTH_B两者的乘积应相等"
+
+    assert(size_a == size_b , msg)
+    assert(MEMORY_TYPE == "auto" || MEMORY_TYPE == "block" || MEMORY_TYPE == "distributed" || MEMORY_TYPE == "ultra", "MEMORY_TYPE应为auto，block，distributed，ultra中的一种")
+    if (MEMORY_TYPE == "block") {
+        assert(READ_LATENCY_A >= 1, "使用BRAM时,READ_LATENCY_A至少为1")
+        assert(READ_LATENCY_B >= 1, "使用BRAM时,READ_LATENCY_B至少为1")
+
+    }
+    val ADDR_WIDTH_A: Int = log2Up(DEPTH_A); // DECIMAL
+    val ADDR_WIDTH_B: Int = log2Up(DEPTH_B); // DECIMAL
+    val AUTO_SLEEP_TIME: Int = 0; // DECIMAL
+    val BYTE_WRITE_WIDTH_A: Int = WIDTH_A; // DECIMAL
+    val BYTE_WRITE_WIDTH_B: Int = WIDTH_B; // DECIMAL
+    val CASCADE_HEIGHT: Int = 0; // DECIMAL
+    val CLOCKING_MODE: String = "common_clock"; // String
+    val ECC_MODE: String = "no_ecc"; // String
+    val MEMORY_INIT_FILE: String = "none"; // String
+    val MEMORY_INIT_PARAM: String = "0"; // String
+    val MEMORY_OPTIMIZATION: String = "true"; // String
+    val MEMORY_PRIMITIVE: String = "auto"; // String
+    val MEMORY_SIZE: Int = 2048; // DECIMAL
+    val MESSAGE_CONTROL: Int = 0; // DECIMAL
+    val READ_DATA_WIDTH_A: Int = 32; // DECIMAL
+    val READ_DATA_WIDTH_B: Int = 32; // DECIMAL
+    val LATENCY_A: Int = READ_LATENCY_A; // DECIMAL
+    val LATENCY_B: Int = READ_LATENCY_B; // DECIMAL
+    val READ_RESET_VALUE_A: String = "0"; // String
+    val READ_RESET_VALUE_B: String = "0"; // String
+    val RST_MODE_A: String = "SYNC"; // String
+    val RST_MODE_B: String = "SYNC"; // String
+    val SIM_ASSERT_CHK: Int = 0; // DECIMAL; 0=disable simulation messages, 1=enable simulation messages
+    val USE_EMBEDDED_CONSTRAINT: Int = 0; // DECIMAL
+    val USE_MEM_INIT: Int = 1; // DECIMAL
+    val WAKEUP_TIME: String = "disable_sleep"; // String
+    val WRITE_DATA_WIDTH_A: Int = 32; // DECIMAL
+    val WRITE_DATA_WIDTH_B: Int = 32; // DECIMAL
+    val WRITE_MODE_A: String = "read_first"; // String
+    val WRITE_MODE_B: String = "read_first"; // String
 }
-object tdpram{
+
+object tdpram {
     def main(args: Array[String]): Unit = {
 
     }

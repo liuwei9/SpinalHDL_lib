@@ -138,7 +138,8 @@ class sdpram(
                 READ_WIDTH: Int,
                 READ_DEPTH:Int,
                 MEMORY_TYPE: String = "block",
-                READ_LATENCY: Int = 2
+                READ_LATENCY: Int = 2,
+                CLOCK_MODE:String="common_clock"
             ) extends Component {
     assert(WRITE_DEPTH*WRITE_WIDTH == READ_DEPTH*READ_WIDTH,"读写空间大小不匹配，WRITE_DEPTH*WRITE_WIDTH和READ_DEPTH*READ_WIDTH大小应相等")
     val ADDR_WIDTH_A: Int = log2Up(WRITE_DEPTH)
@@ -148,10 +149,11 @@ class sdpram(
     if (MEMORY_TYPE == "block") {
         assert(READ_LATENCY >= 1, "使用BRAM时,READ_LATENCY至少为1")
     }
+    assert(CLOCK_MODE=="common_clock"||CLOCK_MODE=="independent_clock","CLOCK_MODE应为common_clock或independent_clock")
     val AUTO_SLEEP_TIME: Int = 0 // DECIMAL
     val BYTE_WRITE_WIDTH_A: Int = WRITE_WIDTH // DECIMAL
     val CASCADE_HEIGHT: Int = 0 // DECIMAL
-    val CLOCKING_MODE: String = "common_clock" // String
+    val CLOCKING_MODE: String = CLOCK_MODE // String
     val ECC_MODE: String = "no_ecc" // String
     val MEMORY_INIT_FILE: String = "none" // String
     val MEMORY_INIT_PARAM: String = "0" // String
@@ -219,6 +221,6 @@ class sdpram(
 
 object sdpram {
     def main(args: Array[String]): Unit = {
-        SpinalConfig(targetDirectory = "verilog/xmemory").generateVerilog(new sdpram(32, 511, 16, 1022,"block", 1))
+        SpinalConfig(targetDirectory = "verilog/xmemory").generateVerilog(new sdpram(32, 511, 16, 1022,"block", 1,"independent_clock"))
     }
 }
