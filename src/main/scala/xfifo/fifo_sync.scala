@@ -36,12 +36,87 @@ class xpm_fifo_sync(
     addGeneric("WAKEUP_TIME",WAKEUP_TIME)
     addGeneric("WRITE_DATA_WIDTH",WRITE_DATA_WIDTH)
     addGeneric("WR_DATA_COUNT_WIDTH",WR_DATA_COUNT_WIDTH)
-
-
+    val io = new Bundle{
+        val almost_empty = out Bool()
+        val almost_full = out Bool()
+        val data_valid = out Bool()
+        val dbiterr = out Bool()
+        val dout = out Bits(READ_DATA_WIDTH bits)
+        val empty = out Bool()
+        val full = out Bool()
+        val overflow = out Bool()
+        val prog_empty = out Bool()
+        val prog_full = out Bool()
+        val rd_data_count = out Bits(RD_DATA_COUNT_WIDTH bits)
+        val rd_rst_busy = out Bool()
+        val sbiterr = out Bool()
+        val underflow = out Bool()
+        val wr_ack = out Bool()
+        val wr_data_count = out Bits(WR_DATA_COUNT_WIDTH bits)
+        val wr_rst_busy = out Bool()
+        val din = in Bits(WRITE_DATA_WIDTH bits)
+        val injectdbiterr = in Bool()
+        val injectsbiterr = in Bool()
+        val rd_en = in Bool()
+        val rst = in Bool()
+        val sleep = in Bool()
+        val wr_clk = in Bool()
+        val wr_en = in Bool()
+    }
+    noIoPrefix()
+    mapClockDomain(clock = io.wr_clk)
 }
 
 object xpm_fifo_sync {
+    def apply(
+                 DOUT_RESET_VALUE: String = "0", // String
+                 ECC_MODE: String = "no_ecc", // String
+                 FIFO_MEMORY_TYPE: String = "auto", // String
+                 FIFO_READ_LATENCY: Int = 1, // DECIMAL
+                 FIFO_WRITE_DEPTH: Int = 2048, // DECIMAL
+                 FULL_RESET_VALUE: Int = 0, // DECIMAL
+                 PROG_EMPTY_THRESH: Int = 10, // DECIMAL
+                 PROG_FULL_THRESH: Int = 10, // DECIMAL
+                 RD_DATA_COUNT_WIDTH: Int = 1, // DECIMAL
+                 READ_DATA_WIDTH: Int = 32, // DECIMAL
+                 READ_MODE: String = "std", // String
+                 SIM_ASSERT_CHK: Int = 0, // DECIMAL; 0=disable simulation messages, 1=enable simulation messages
+                 USE_ADV_FEATURES: String = "0707", // String
+                 WAKEUP_TIME: Int = 0, // DECIMAL
+                 WRITE_DATA_WIDTH: Int = 32, // DECIMAL
+                 WR_DATA_COUNT_WIDTH: Int = 1 // DECIMAL
+             )(almost_empty:Bool,almost_full:Bool,data_valid:Bool,dbiterr:Bool,dout:Bits,empty:Bool,full:Bool,overflow:Bool,prog_empty:Bool,
+               prog_full:Bool,rd_data_count:Bits,rd_rst_busy:Bool,sbiterr:Bool,underflow:Bool,wr_ack:Bool,wr_data_count:Bits,wr_rst_busy:Bool,
+        din:Bits,injectdbiterr:Bool,injectsbiterr:Bool,rd_en:Bool,rst:Bool,sleep:Bool,wr_en:Bool): xpm_fifo_sync ={
+        val temp = new xpm_fifo_sync(DOUT_RESET_VALUE,ECC_MODE,FIFO_MEMORY_TYPE,FIFO_READ_LATENCY,FIFO_WRITE_DEPTH,FULL_RESET_VALUE,PROG_EMPTY_THRESH,
+            PROG_FULL_THRESH,RD_DATA_COUNT_WIDTH,READ_DATA_WIDTH,READ_MODE,SIM_ASSERT_CHK,USE_ADV_FEATURES,WAKEUP_TIME,WRITE_DATA_WIDTH,WR_DATA_COUNT_WIDTH)
+        temp.io.almost_empty <> almost_empty
+        temp.io.almost_full <> almost_full
+        temp.io.data_valid <>data_valid
+        temp.io.dbiterr <> dbiterr
+        temp.io.dout <> dout
+        temp.io.empty <> empty
+        temp.io.full <> full
+        temp.io.overflow <> overflow
+        temp.io.prog_empty <> prog_empty
+        temp.io.prog_full <> prog_full
+        temp.io.rd_data_count <> rd_data_count
+        temp.io.rd_rst_busy <> rd_rst_busy
+        temp.io.sbiterr <> sbiterr
+        temp.io.underflow <> underflow
+        temp.io.wr_ack <> wr_ack
+        temp.io.wr_data_count <> wr_data_count
+        temp.io.wr_rst_busy <> wr_rst_busy
+        temp.io.din <> din
+        temp.io.injectdbiterr <> injectdbiterr
+        temp.io.injectsbiterr <> injectsbiterr
+        temp.io.rd_en <> rd_en
+        temp.io.rst <> rst
+        temp.io.sleep <> sleep
+        temp.io.wr_en <> wr_en
 
+        temp
+    }
 }
 
 class fifo_sync {
