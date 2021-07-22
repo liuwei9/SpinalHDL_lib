@@ -64,7 +64,7 @@ class xpm_fifo_sync(
         val wr_en = in Bool()
     }
     noIoPrefix()
-    mapClockDomain(clock = io.wr_clk,reset = io.rst)
+    mapClockDomain(clock = io.wr_clk, reset = io.rst)
 }
 
 object xpm_fifo_sync {
@@ -87,7 +87,7 @@ object xpm_fifo_sync {
                  WR_DATA_COUNT_WIDTH: Int = 1 // DECIMAL
              )(almost_empty: Bool, almost_full: Bool, data_valid: Bool, dbiterr: Bool, dout: Bits, empty: Bool, full: Bool, overflow: Bool, prog_empty: Bool,
                prog_full: Bool, rd_data_count: Bits, rd_rst_busy: Bool, sbiterr: Bool, underflow: Bool, wr_ack: Bool, wr_data_count: Bits, wr_rst_busy: Bool,
-               din: Bits, injectdbiterr: Bool, injectsbiterr: Bool, rd_en: Bool, rst: Bool, sleep: Bool, wr_en: Bool): xpm_fifo_sync = {
+               din: Bits, injectdbiterr: Bool, injectsbiterr: Bool, rd_en: Bool,  sleep: Bool, wr_en: Bool): xpm_fifo_sync = {
         val temp = new xpm_fifo_sync(DOUT_RESET_VALUE, ECC_MODE, FIFO_MEMORY_TYPE, FIFO_READ_LATENCY, FIFO_WRITE_DEPTH, FULL_RESET_VALUE, PROG_EMPTY_THRESH,
             PROG_FULL_THRESH, RD_DATA_COUNT_WIDTH, READ_DATA_WIDTH, READ_MODE, SIM_ASSERT_CHK, USE_ADV_FEATURES, WAKEUP_TIME, WRITE_DATA_WIDTH, WR_DATA_COUNT_WIDTH)
         temp.io.almost_empty <> almost_empty
@@ -146,42 +146,66 @@ class fifo_sync(
         }
     }
     assert(wr_ratio, "Write and read width aspect ratio must be 1:1, 1:2, 1:4, 1:8, 8:1, 4:1 and 2:1 ")
+    val WRITE_DATA_WIDTH: Int = WRITE_WIDTH // DECIMAL
+    val READ_DATA_WIDTH: Int = READ_WIDTH // DECIMAL
+    val FIFO_WRITE_DEPTH: Int = WRITE_DEPTH // DECIMAL
     val READ_MODE_VAL = if (READ_MODE == "fwft") 1 else 0
     val FIFO_READ_DEPTH = FIFO_WRITE_DEPTH * WRITE_DATA_WIDTH / READ_DATA_WIDTH
     val DOUT_RESET_VALUE: String = "0" // String
     val ECC_MODE: String = "no_ecc" // String
     val FIFO_MEMORY_TYPE: String = MEMORY_TYPE // String
     val FIFO_READ_LATENCY: Int = READ_LATENCY // DECIMAL
-    val FIFO_WRITE_DEPTH: Int = WRITE_DEPTH // DECIMAL
+
     val FULL_RESET_VALUE: Int = 0 // DECIMAL
     val PROG_EMPTY_THRESH: Int = 3 + (READ_MODE_VAL * 2) // DECIMAL
     val PROG_FULL_THRESH: Int = (FIFO_WRITE_DEPTH - 3) - (READ_MODE_VAL * 2 * (FIFO_WRITE_DEPTH / FIFO_READ_DEPTH)) // DECIMAL
     val RD_DATA_COUNT_WIDTH: Int = log2Up(FIFO_READ_DEPTH) // DECIMAL
-    val READ_DATA_WIDTH: Int = READ_WIDTH // DECIMAL
+
     val READ_MODE_A: String = READ_MODE // String
     val SIM_ASSERT_CHK: Int = 0 // DECIMAL; 0=disable simulation messages, 1=enable simulation messages
     val USE_ADV_FEATURES: String = "1404" // String  使能wr_data_count，rd_data_count，data_valid
     val WAKEUP_TIME: Int = 0 // DECIMAL
-    val WRITE_DATA_WIDTH: Int = WRITE_WIDTH // DECIMAL
+
     val WR_DATA_COUNT_WIDTH: Int = log2Up(FIFO_WRITE_DEPTH) // DECIMAL
 
-    val io = new Bundle{
-        val clk = in Bool()
-        val rst = in Bool()
+    val io = new Bundle {
         val full = out Bool()
         val wr_en = in Bool()
-        val din = in Bits(WRITE_WIDTH bits)
+        val din = in Bits (WRITE_WIDTH bits)
         val empty = out Bool()
-        val dout = out Bits(READ_WIDTH bits)
+        val dout = out Bits (READ_WIDTH bits)
         val rd_en = in Bool()
-        val wr_data_count = out Bits(WR_DATA_COUNT_WIDTH bits)
-        val rd_data_count = out Bits(RD_DATA_COUNT_WIDTH bits)
+        val wr_data_count = out Bits (WR_DATA_COUNT_WIDTH bits)
+        val rd_data_count = out Bits (RD_DATA_COUNT_WIDTH bits)
         val data_valid = out Bool()
     }
+    noIoPrefix()
+    val almost_empty = Bool()
+    val almost_full = Bool()
+    val dbiterr = Bool()
+    val overflow = Bool()
+    val prog_empty = Bool()
+    val prog_full = Bool()
+    val rd_rst_busy = Bool()
+    val sbiterr = Bool()
+    val underflow = Bool()
+    val wr_ack = Bool()
+    val wr_rst_busy = Bool()
+    val injectdbiterr = Bool()
+    injectdbiterr := False
+    val injectsbiterr = Bool()
+    injectsbiterr := False
+    val sleep=Bool()
+    sleep:= False
+    val temp = xpm_fifo_sync(DOUT_RESET_VALUE, ECC_MODE, FIFO_MEMORY_TYPE, FIFO_READ_LATENCY, FIFO_WRITE_DEPTH, FULL_RESET_VALUE, PROG_EMPTY_THRESH
+        , PROG_FULL_THRESH, RD_DATA_COUNT_WIDTH, READ_DATA_WIDTH, READ_MODE_A, SIM_ASSERT_CHK, USE_ADV_FEATURES, WAKEUP_TIME, WRITE_DATA_WIDTH, WR_DATA_COUNT_WIDTH)(
+        almost_empty, almost_full, io.data_valid, dbiterr, io.dout, io.empty, io.full, overflow, prog_empty, prog_full, io.rd_data_count,
+        rd_rst_busy, sbiterr, underflow, wr_ack, io.wr_data_count, wr_rst_busy, io.din, injectdbiterr, injectsbiterr, io.rd_en, sleep, io.wr_en)
 }
+
 
 object fifo_sync {
     def main(args: Array[String]): Unit = {
-        val t = new fifo_sync(12, 1024, 3)
+        SpinalConfig(targetDirectory = "verilog/xfifo").generateVerilog( new fifo_sync(12, 1024, 3,0,"block","fwft"))
     }
 }
