@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.5.0    git head : 83a031922866b078c411ec5529e00f1b6e79f8e7
 // Component : fifo_sync
-// Git hash  : b01332748bc4096f0ef85ba395527a9879518540
+// Git hash  : 79e15129bd45ef12610b1f638f893cea8eefd694
 
 
 
@@ -9,11 +9,13 @@ module fifo_sync (
   input               wr_en,
   input      [11:0]   din,
   output              empty,
-  output     [2:0]    dout,
+  output     [11:0]   dout,
   input               rd_en,
   output     [9:0]    wr_data_count,
-  output     [11:0]   rd_data_count,
+  output     [9:0]    rd_data_count,
   output              data_valid,
+  output              rd_rst_busy,
+  output              wr_rst_busy,
   input               reset,
   input               clk
 );
@@ -21,13 +23,13 @@ module fifo_sync (
   wire                temp_almost_full;
   wire                temp_data_valid;
   wire                temp_dbiterr;
-  wire       [2:0]    temp_dout;
+  wire       [11:0]   temp_dout;
   wire                temp_empty;
   wire                temp_full;
   wire                temp_overflow;
   wire                temp_prog_empty;
   wire                temp_prog_full;
-  wire       [11:0]   temp_rd_data_count;
+  wire       [9:0]    temp_rd_data_count;
   wire                temp_rd_rst_busy;
   wire                temp_sbiterr;
   wire                temp_underflow;
@@ -40,11 +42,9 @@ module fifo_sync (
   wire                overflow;
   wire                prog_empty;
   wire                prog_full;
-  wire                rd_rst_busy;
   wire                sbiterr;
   wire                underflow;
   wire                wr_ack;
-  wire                wr_rst_busy;
   wire                injectdbiterr;
   wire                injectsbiterr;
   wire                sleep;
@@ -57,9 +57,9 @@ module fifo_sync (
     .FIFO_WRITE_DEPTH(1024),
     .FULL_RESET_VALUE(0),
     .PROG_EMPTY_THRESH(5),
-    .PROG_FULL_THRESH(1021),
-    .RD_DATA_COUNT_WIDTH(12),
-    .READ_DATA_WIDTH(3),
+    .PROG_FULL_THRESH(1019),
+    .RD_DATA_COUNT_WIDTH(10),
+    .READ_DATA_WIDTH(12),
     .READ_MODE("fwft"),
     .SIM_ASSERT_CHK(0),
     .USE_ADV_FEATURES("1404"),

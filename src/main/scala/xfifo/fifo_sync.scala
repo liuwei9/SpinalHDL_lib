@@ -178,6 +178,8 @@ class fifo_sync(
         val wr_data_count = out Bits (WR_DATA_COUNT_WIDTH bits)
         val rd_data_count = out Bits (RD_DATA_COUNT_WIDTH bits)
         val data_valid = out Bool()
+        val rd_rst_busy = out Bool()
+        val wr_rst_busy = out Bool()
     }
     noIoPrefix()
     val almost_empty = Bool()
@@ -186,11 +188,11 @@ class fifo_sync(
     val overflow = Bool()
     val prog_empty = Bool()
     val prog_full = Bool()
-    val rd_rst_busy = Bool()
+
     val sbiterr = Bool()
     val underflow = Bool()
     val wr_ack = Bool()
-    val wr_rst_busy = Bool()
+
     val injectdbiterr = Bool()
     injectdbiterr := False
     val injectsbiterr = Bool()
@@ -200,12 +202,12 @@ class fifo_sync(
     val temp = xpm_fifo_sync(DOUT_RESET_VALUE, ECC_MODE, FIFO_MEMORY_TYPE, FIFO_READ_LATENCY, FIFO_WRITE_DEPTH, FULL_RESET_VALUE, PROG_EMPTY_THRESH
         , PROG_FULL_THRESH, RD_DATA_COUNT_WIDTH, READ_DATA_WIDTH, READ_MODE_A, SIM_ASSERT_CHK, USE_ADV_FEATURES, WAKEUP_TIME, WRITE_DATA_WIDTH, WR_DATA_COUNT_WIDTH)(
         almost_empty, almost_full, io.data_valid, dbiterr, io.dout, io.empty, io.full, overflow, prog_empty, prog_full, io.rd_data_count,
-        rd_rst_busy, sbiterr, underflow, wr_ack, io.wr_data_count, wr_rst_busy, io.din, injectdbiterr, injectsbiterr, io.rd_en, sleep, io.wr_en)
+        io.rd_rst_busy, sbiterr, underflow, wr_ack, io.wr_data_count, io.wr_rst_busy, io.din, injectdbiterr, injectsbiterr, io.rd_en, sleep, io.wr_en)
 }
 
 
 object fifo_sync {
     def main(args: Array[String]): Unit = {
-        SpinalConfig(targetDirectory = "verilog/xfifo").generateVerilog( new fifo_sync(12, 1024, 3,0,"block","fwft"))
+        SpinalConfig(targetDirectory = "verilog/xfifo").generateVerilog( new fifo_sync(12, 1024, 12,0,"block","fwft"))
     }
 }
