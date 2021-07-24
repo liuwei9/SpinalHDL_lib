@@ -131,7 +131,9 @@ class fifo_sync(
     if (READ_MODE == "fwft") {
         assert(READ_LATENCY == 0, "If READ_MODE = \"fwft\", then the only applicable value is 0")
     }
-
+    if(MEMORY_TYPE=="auto"){
+        assert(WRITE_WIDTH == READ_WIDTH,"WRITE_DATA_WIDTH should be equal to READ_DATA_WIDTH if FIFO_MEMORY_TYPE is set to \"auto\".")
+    }
     assert((WRITE_DEPTH & (WRITE_DEPTH - 1)) == 0, "Defines the FIFO Write Depth, must be power of two")
     var wr_ratio = false
     if (WRITE_WIDTH == READ_WIDTH) {
