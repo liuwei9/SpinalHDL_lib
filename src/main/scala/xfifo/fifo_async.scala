@@ -141,7 +141,7 @@ class fifo_async (
     assert(MEMORY_TYPE == "auto" || MEMORY_TYPE == "block" || MEMORY_TYPE == "distributed", "MEMORY_TYPE应为auto，block，distributed中的一种")
     assert(READ_MODE == "std" || READ_MODE == "fwft", "READ_MODE应为std或fwft")
     if (READ_MODE == "fwft") {
-        assert(READ_LATENCY == 0, "If READ_MODE = \"fwft\", then the only applicable value is 0")
+        assert(READ_LATENCY == 0, "If READ_MODE = \"fwft\", then READ_LATENCY only applicable value is 0")
     }
     if(MEMORY_TYPE=="auto"){
         assert(WRITE_WIDTH == READ_WIDTH,"WRITE_DATA_WIDTH should be equal to READ_DATA_WIDTH if FIFO_MEMORY_TYPE is set to \"auto\".")
