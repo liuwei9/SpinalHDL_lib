@@ -174,7 +174,7 @@ class fifo_async (
     val FULL_RESET_VALUE: Int = 0 // DECIMAL
     val PROG_EMPTY_THRESH: Int = 3 + (READ_MODE_VAL*2) // DECIMAL
     val PROG_FULL_THRESH: Int = (FIFO_WRITE_DEPTH-3) - (READ_MODE_VAL*2*(FIFO_WRITE_DEPTH/FIFO_READ_DEPTH))  // DECIMAL
-    val RD_DATA_COUNT_WIDTH: Int = log2Up(FIFO_READ_DEPTH) // DECIMAL
+    val RD_DATA_COUNT_WIDTH: Int = log2Up(FIFO_READ_DEPTH) + 1// DECIMAL
 
     val READ_MODE_A: String = READ_MODE // String
     val RELATED_CLOCKS: Int = 0
@@ -182,7 +182,7 @@ class fifo_async (
     val USE_ADV_FEATURES: String = "1404" // String  使能wr_data_count，rd_data_count，data_valid
     val WAKEUP_TIME: Int = 0 // DECIMAL
 
-    val WR_DATA_COUNT_WIDTH: Int = log2Up(WRITE_DEPTH) // DECIMAL
+    val WR_DATA_COUNT_WIDTH: Int = log2Up(WRITE_DEPTH) + 1// DECIMAL
 
     val io = new Bundle {
         val full = out Bool()
