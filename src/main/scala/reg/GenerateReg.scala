@@ -1,7 +1,7 @@
 package reg
 
 import java.io.{File, FileInputStream, FileOutputStream}
-import org.apache.poi.ss.usermodel.WorkbookFactory
+import org.apache.poi.ss.usermodel.{Cell, WorkbookFactory}
 
 
 class RegClass(var name: String, var base_addr: Int, var bit_offset: Int, var bit_width: Int, var description: String, var access: String, var reset: String, var is_self_clearing: String, var data_type: String) {
@@ -28,7 +28,7 @@ class GenerateReg(SCALA_PATH: String, SRC_EXCEL_PATH: String, MODULE_NAME: Strin
 
     val lastNum = excel_Sheet.getLastRowNum
 
-//    var Offset_data = 0
+    //    var Offset_data = 0
 
     for (a <- 1 to lastNum) {
         val row = excel_Sheet.getRow(a)
@@ -48,7 +48,7 @@ class GenerateReg(SCALA_PATH: String, SRC_EXCEL_PATH: String, MODULE_NAME: Strin
         val Bit_width_data = Bit_width.getNumericCellValue.toInt
 
         val Description = row.getCell(4)
-        val Description_data = Description.getStringCellValue
+        val Description_data = if (Description == null || Description.getCellType() == Cell.CELL_TYPE_BLANK) "" else Description.getStringCellValue
 
         val Access = row.getCell(5)
         val Access_data = Access.getStringCellValue
@@ -84,7 +84,7 @@ class GenerateReg(SCALA_PATH: String, SRC_EXCEL_PATH: String, MODULE_NAME: Strin
             }
             regList = new RegClass(Name_data, base_addr_data, Bit_offset_data, Bit_width_data, Description_data, Access_data, Reset_data, IS_SELF_CLEARING_data, DataType_data) :: regList
         }
-//        Offset_data = Offset_data + 4
+        //        Offset_data = Offset_data + 4
     }
     footer = footer + "}\n"
     io = io + "}\n"
@@ -107,15 +107,15 @@ class GenerateReg(SCALA_PATH: String, SRC_EXCEL_PATH: String, MODULE_NAME: Strin
             require(old_addr_range > 0 && old_addr_range <= 32, reg.head.name + "为Bits类型bit_width必须介于1到32之间")
         require(reg.head.bit_offset + old_addr_range <= 32, reg.head.name + "的bit_offset+bit_width不能大于32")
         for (i <- 1 until reg.length) {
-            val new_base_addr = reg(i).base_addr * 32 + reg.head.bit_offset
+            val new_base_addr = reg(i).base_addr * 32 + reg(i).bit_offset
             val new_addr_range = reg(i).bit_width
             if (reg(i).data_type == "Bool")
                 require(new_addr_range == 1, reg(i).name + "为Bool类型bit_width必须为1")
             if (reg(i).data_type == "Bits")
                 require(new_addr_range > 0 && new_addr_range <= 32, reg(i).name + "为Bits类型bit_width必须介于1到32之间")
             require(reg(i).bit_offset + new_addr_range <= 32, reg(i).name + "的bit_offset+bit_width不能大于32")
-            require(old_base_addr + old_addr_range < new_base_addr + new_addr_range, reg(i).name + "与" + old_name + "地址冲突")
-           old_base_addr = new_base_addr
+            require(old_base_addr + old_addr_range < new_base_addr + 1, reg(i).name + "与" + old_name + "地址冲突")
+            old_base_addr = new_base_addr
             old_addr_range = new_addr_range
             old_name = reg(i).name
 
@@ -129,8 +129,8 @@ object GenerateReg {
 
     def main(args: Array[String]): Unit = {
         val scala_path = "src/main/scala/"
-        val src_excel_path = "src/main/scala/reg/test1.xlsx"
-        val module_name = "wa"
+        val src_excel_path = "F:\\vu9p\\pcie_yolo\\user\\reg\\Yolov4_tiny_reg.xlsx"
+        val module_name = "Yolov4_tiny_reg"
         new GenerateReg(scala_path, src_excel_path, module_name)
     }
 }

@@ -11,6 +11,6 @@ libraryDependencies ++= Seq(
     "com.github.spinalhdl" % "spinalhdl-lib_2.11" % "1.6.0",
     compilerPlugin("com.github.spinalhdl" % "spinalhdl-idsl-plugin_2.11" % "1.6.0"),
     "com.google.code.gson" % "gson" % "2.7",
-    "org.apache.poi" % "poi" % "5.0.0",
-    "org.apache.poi" % "poi-ooxml" % "5.0.0"
+    "org.apache.poi" % "poi" % "3.8",
+    "org.apache.poi" % "poi-ooxml" % "3.8"
 )
